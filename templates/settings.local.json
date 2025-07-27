@@ -28,6 +28,10 @@
           {
             "type": "command",
             "command": "$HOME/.claude/hooks/docs-reviewer.py"
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/docs-editor-agent.py"
           }
         ]
       },

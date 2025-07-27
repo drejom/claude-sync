@@ -27,6 +27,13 @@ curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install.sh |
 - Suggests optimal HPC resources based on workload history
 - Cross-host performance data sharing with encrypted sync
 
+### Documentation Intelligence
+- Comprehensive documentation review system with specialized agents
+- Ruthless editor that detects AI/inexperienced author patterns
+- Context-aware analysis for R packages, READMEs, vignettes
+- Example validation with syntax and runtime testing
+- Audience optimization for user/developer/scientist content
+
 ### Background Maintenance
 - Auto-updates hooks when improvements are available
 - Documentation review before git pushes
