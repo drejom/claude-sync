@@ -2,16 +2,19 @@
 
 AI-powered command optimization and intelligent host routing for Claude Code.
 
-## Installation
+## Installation & Setup
 
+**One-liner install + setup:**
 ```bash
-mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git
+mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git && ~/.claude/claude-hooks/update-claude.sh --update
 ```
 
-## Management
-
-Use the update manager for all maintenance:
+**Or step by step:**
 ```bash
+# Install
+mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git
+
+# Setup (auto-configures globally)
 ~/.claude/claude-hooks/update-claude.sh
 ```
 
@@ -46,11 +49,16 @@ Use the update manager for all maintenance:
 - Documentation review before git pushes
 - Secure cross-host learning data synchronization
 
-## Quick Start
+## Management
 
-The update manager automatically sets up global configuration:
+**Update hooks and Claude Code:**
 ```bash
-~/.claude/claude-hooks/update-claude.sh
+~/.claude/claude-hooks/update-claude.sh --update
+```
+
+**Fix stuck installations:**
+```bash
+~/.claude/claude-hooks/update-claude.sh --nuclear
 ```
 
 **Manual per-project setup** (if needed):
