@@ -48,7 +48,12 @@ Use the update manager for all maintenance:
 
 ## Quick Start
 
-Activate in any project:
+**Option 1: Global setup (recommended)**
+```bash
+cp ~/.claude/claude-hooks/templates/settings.global.json ~/.claude/settings.json
+```
+
+**Option 2: Per-project setup**
 ```bash
 mkdir -p .claude && cp ~/.claude/claude-hooks/templates/settings.local.json ./.claude/
 ```
