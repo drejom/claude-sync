@@ -4,14 +4,8 @@ AI-powered command optimization and intelligent host routing for Claude Code.
 
 ## Installation
 
-### SSH Installation (Recommended for Private Repos)
 ```bash
-curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install-ssh.sh | bash
-```
-
-### HTTPS Installation (Public Repos)
-```bash
-curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install.sh | bash
+cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git
 ```
 
 ## Core Capabilities
@@ -47,20 +41,14 @@ curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install.sh |
 
 ## Quick Start
 
-Install on each host:
-```bash
-curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install.sh | bash
-```
-
 Activate in any project:
 ```bash
-cd your-project
-cp ~/.claude/project-template.json ./.claude/settings.local.json
+cp ~/.claude/claude-hooks/templates/settings.local.json ./.claude/
 ```
 
 Update hooks:
 ```bash
-update-claude-hooks
+cd ~/.claude/claude-hooks && git pull
 ```
 
 ## 🛠️ How It Works
