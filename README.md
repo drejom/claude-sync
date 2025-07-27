@@ -5,7 +5,7 @@ AI-powered command optimization and intelligent host routing for Claude Code.
 ## Installation
 
 ```bash
-cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git
+mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git
 ```
 
 ## Core Capabilities
@@ -43,7 +43,7 @@ cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git
 
 Activate in any project:
 ```bash
-cp ~/.claude/claude-hooks/templates/settings.local.json ./.claude/
+mkdir -p .claude && cp ~/.claude/claude-hooks/templates/settings.local.json ./.claude/
 ```
 
 Update hooks:
