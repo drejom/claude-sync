@@ -1,55 +1,51 @@
 # Claude Code Portable Hooks
 
-🚀 **Matrix-like bash and SSH superpowers for Claude Code across all your hosts**
+AI-powered command optimization and intelligent host routing for Claude Code.
 
-## ⚡ One-Liner Install
+## Installation
 
 ```bash
 curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install.sh | bash
 ```
 
-## 🎯 What You Get
+## Core Capabilities
 
-### 🔧 **Enhanced Bash Optimization**
-- **Smart upgrades**: `grep` → `rg`, `find` → `fd`, `cat` → `bat`
-- **AI-learned patterns**: Suggests flags based on your successful commands
-- **Domain awareness**: HPC, genomics, and R computing optimizations
-- **Safety warnings**: Dangerous operations get friendly warnings
+### Command Optimization
+- Automatic command upgrades: `grep` → `rg`, `find` → `fd`
+- AI learns your successful command patterns and suggests improvements
+- HPC-specific optimizations for SLURM, Singularity, genomics tools
+- Safety warnings for destructive operations
 
-### 🧠 **AI-Powered SSH Intelligence**
-- **Self-learning network topology**: Securely learns host capabilities and connections
-- **Intelligent routing**: Suggests optimal hosts based on command type and learned patterns
-- **Genomics awareness**: Routes bioinformatics workflows to appropriate clusters
-- **Security-first**: All learning data encrypted and abstracted
+### Intelligent Host Routing  
+- Learns filesystem topology across your hosts securely
+- Routes commands to optimal hosts based on data location and capabilities
+- Bioinformatics workflow awareness (FASTQ, BAM, VCF file handling)
+- Supports mixed Tailscale + SSH environments
 
-### ⚡ **Performance Intelligence**
-- **Resource monitoring**: Tracks memory, CPU, and execution time patterns
-- **Optimization suggestions**: Recommends HPC resources based on learned patterns
-- **Workflow intelligence**: Learns which tools work best where
+### Performance Learning
+- Monitors resource usage patterns (memory, CPU, execution time)
+- Suggests optimal HPC resources based on workload history
+- Cross-host performance data sharing with encrypted sync
 
-### 🌍 **Portable Across Hosts**
-- **Synced configuration**: Same superpowers on every machine
-- **Easy updates**: `update-claude-hooks` keeps everything current
-- **Project templates**: One command to activate in new projects
+### Background Maintenance
+- Auto-updates hooks when improvements are available
+- Documentation review before git pushes
+- Secure cross-host learning data synchronization
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1. Install (one-time per host)
+Install on each host:
 ```bash
 curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install.sh | bash
 ```
 
-### 2. Activate in any project
+Activate in any project:
 ```bash
 cd your-project
 cp ~/.claude/project-template.json ./.claude/settings.local.json
 ```
 
-### 3. Start using Claude Code with superpowers! 🎉
-
-## 🔄 Keeping Updated
-
-Update hooks across all hosts:
+Update hooks:
 ```bash
 update-claude-hooks
 ```
