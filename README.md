@@ -8,6 +8,13 @@ AI-powered command optimization and intelligent host routing for Claude Code.
 mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git
 ```
 
+## Management
+
+Use the update manager for all maintenance:
+```bash
+~/.claude/claude-hooks/update-claude.sh
+```
+
 ## Core Capabilities
 
 ### Command Optimization
@@ -44,11 +51,6 @@ mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hoo
 Activate in any project:
 ```bash
 mkdir -p .claude && cp ~/.claude/claude-hooks/templates/settings.local.json ./.claude/
-```
-
-Update hooks:
-```bash
-cd ~/.claude/claude-hooks && git pull
 ```
 
 ## 🛠️ How It Works
