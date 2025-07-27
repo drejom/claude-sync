@@ -118,11 +118,11 @@ Each project can customize which hooks to enable in `.claude/settings.local.json
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/bash-optimizer.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/bash-optimizer-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/ssh-router.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/ssh-router-enhanced.py"
           }
         ]
       }
@@ -164,7 +164,7 @@ Add your own hooks to the `hooks/` directory and they'll be synced across hosts.
 The router automatically reads your `~/.ssh/config` for available hosts.
 
 ### Learning Data Management
-- View learning data: `python3 ~/.claude/hooks/ssh-router.py --stats`
+- View learning data: `python3 ~/.claude/claude-hooks/hooks/ssh-router-enhanced.py --stats`
 - Reset learning: `rm ~/.claude/ssh_topology.pkl`
 
 ## 🤝 Contributing
