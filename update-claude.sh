@@ -72,6 +72,8 @@ update_hooks() {
         mkdir -p ~/.claude
         cd ~/.claude
         git clone git@github.com:drejom/claude-hooks.git
+        cd claude-hooks
+        setup_dependencies
         setup_global_config
     else
         echo "Updating existing hooks..."
@@ -86,6 +88,9 @@ update_hooks() {
         # Pull latest changes
         git pull origin main
         echo "✅ Hooks updated successfully"
+        
+        # Update dependencies if pyproject.toml changed
+        setup_dependencies
         
         # Update global config if it exists
         setup_global_config
@@ -116,6 +121,51 @@ setup_global_config() {
     else
         echo "⚠️  Template settings not found at $TEMPLATE_SETTINGS"
     fi
+}
+
+setup_dependencies() {
+    echo "📦 Setting up Python dependencies..."
+    
+    # Check if uv is installed
+    if ! command -v uv >/dev/null 2>&1; then
+        echo "Installing uv (modern Python package manager)..."
+        if command -v curl >/dev/null 2>&1; then
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            # Source the new PATH
+            export PATH="$HOME/.cargo/bin:$PATH"
+        else
+            echo "⚠️  curl not found. Please install uv manually:"
+            echo "   curl -LsSf https://astral.sh/uv/install.sh | sh"
+            return 1
+        fi
+    fi
+    
+    # Create virtual environment and install dependencies
+    if [ -f "pyproject.toml" ]; then
+        echo "Installing hook dependencies with uv..."
+        uv sync --no-dev
+        echo "✅ Dependencies installed"
+        
+        # Update the hook scripts to use the uv environment
+        update_hook_shebangs
+    else
+        echo "⚠️  pyproject.toml not found - dependencies not installed"
+    fi
+}
+
+update_hook_shebangs() {
+    echo "🔧 Updating hook scripts to use uv..."
+    
+    # Find Python files and update their shebangs to use uvx
+    find hooks/ agents/ learning/ -name "*.py" -type f 2>/dev/null | while read -r file; do
+        if [ -f "$file" ] && head -1 "$file" | grep -q "#!/usr/bin/env python3"; then
+            # Create a backup and update shebang
+            sed -i.bak '1s|#!/usr/bin/env python3|#!/usr/bin/env -S uv run --directory '"$(pwd)"' python3|' "$file"
+            rm -f "${file}.bak"
+        fi
+    done
+    
+    echo "✅ Hook scripts updated to use uv environment"
 }
 
 install_claude() {

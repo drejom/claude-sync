@@ -18,6 +18,15 @@ mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hoo
 ~/.claude/claude-hooks/update-claude.sh
 ```
 
+## Dependencies
+
+The system uses modern Python tooling:
+- **uv** - Fast Python package manager (auto-installed)
+- **Dependencies** - Automatically managed via `pyproject.toml`
+- **Virtual environment** - Isolated Python environment per installation
+
+All dependencies are handled automatically by the update script!
+
 ## Core Capabilities
 
 ### Command Optimization
@@ -164,8 +173,9 @@ Add your own hooks to the `hooks/` directory and they'll be synced across hosts.
 The router automatically reads your `~/.ssh/config` for available hosts.
 
 ### Learning Data Management
-- View SSH learning: `python3 ~/.claude/claude-hooks/hooks/ssh-router-enhanced.py --stats`
-- View bash optimization: `python3 ~/.claude/claude-hooks/hooks/bash-optimizer-enhanced.py --stats`
+- View all statistics: `~/.claude/claude-hooks/claude-hooks-stats`
+- View SSH learning: `~/.claude/claude-hooks/claude-hooks-stats ssh`
+- View bash optimization: `~/.claude/claude-hooks/claude-hooks-stats bash`
 - Reset learning: `rm ~/.claude/ssh_topology_*.pkl ~/.claude/learning_*.json`
 
 ## 🤝 Contributing
