@@ -30,6 +30,15 @@
             "command": "$HOME/.claude/hooks/docs-reviewer.py"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/docs-agent-orchestrator.py"
+          }
+        ]
       }
     ],
     "PostToolUse": [
