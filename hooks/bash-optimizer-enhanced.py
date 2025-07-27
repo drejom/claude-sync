@@ -29,8 +29,24 @@ def import_learning_modules():
 STORAGE, ABSTRACTOR, SECURE_MODE = import_learning_modules()
 
 def main():
-    # Read hook input
-    hook_input = json.loads(sys.stdin.read())
+    # Handle command line arguments for standalone usage
+    if len(sys.argv) > 1:
+        if sys.argv[1] == '--stats':
+            show_learning_stats()
+            return
+        elif sys.argv[1] == '--help':
+            print("Bash Optimizer Enhanced - Usage:")
+            print("  --stats    Show learning statistics")
+            print("  --help     Show this help")
+            return
+    
+    # Read hook input (when called as a hook)
+    try:
+        hook_input = json.loads(sys.stdin.read())
+    except:
+        print("Error: Expected JSON input from Claude Code hook system")
+        print("Use --stats or --help for standalone usage")
+        sys.exit(1)
     
     if hook_input.get('tool_name') != 'Bash':
         sys.exit(0)
@@ -364,6 +380,30 @@ def get_learned_optimizations():
                     optimizations.append((pattern, replacement))
     
     return optimizations
+
+def show_learning_stats():
+    """Show learning statistics for standalone usage"""
+    print("Bash Optimizer Enhanced - Learning Statistics")
+    print("=" * 50)
+    
+    if STORAGE:
+        try:
+            # Load optimization learning data
+            optimization_data = STORAGE.load_learning_data('bash_optimizations', {})
+            success_data = STORAGE.load_learning_data('command_success_patterns', {})
+            
+            print(f"Commands optimized: {len(optimization_data.get('patterns', {}))}")
+            print(f"Success patterns learned: {len(success_data.get('patterns', {}))}")
+            
+            if optimization_data.get('patterns'):
+                print("\nTop optimizations:")
+                for pattern, info in list(optimization_data['patterns'].items())[:5]:
+                    print(f"  • {pattern} → {info.get('improvement', 'unknown')}")
+                    
+        except Exception as e:
+            print(f"Error loading learning data: {e}")
+    else:
+        print("Learning system not available (missing encryption modules)")
 
 if __name__ == '__main__':
     main()

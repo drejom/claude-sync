@@ -35,8 +35,24 @@ STORAGE, ABSTRACTOR, SECURE_MODE = import_learning_modules()
 FALLBACK_DB = Path.home() / '.claude' / 'ssh_topology.pkl'
 
 def main():
-    # Read hook input
-    hook_input = json.loads(sys.stdin.read())
+    # Handle command line arguments for standalone usage
+    if len(sys.argv) > 1:
+        if sys.argv[1] == '--stats':
+            show_learning_stats()
+            return
+        elif sys.argv[1] == '--help':
+            print("SSH Router Enhanced - Usage:")
+            print("  --stats    Show learning statistics")
+            print("  --help     Show this help")
+            return
+    
+    # Read hook input (when called as a hook)
+    try:
+        hook_input = json.loads(sys.stdin.read())
+    except:
+        print("Error: Expected JSON input from Claude Code hook system")
+        print("Use --stats or --help for standalone usage")
+        sys.exit(1)
     
     if hook_input.get('tool_name') != 'Bash':
         sys.exit(0)
@@ -368,6 +384,45 @@ def save_basic_topology(topology):
             pickle.dump(topology, f)
     except Exception:
         pass
+
+def show_learning_stats():
+    """Show learning statistics for standalone usage"""
+    print("SSH Router Enhanced - Learning Statistics")
+    print("=" * 50)
+    
+    try:
+        # Try to load learning data
+        sys.path.insert(0, str(Path(__file__).parent.parent / 'learning'))
+        from encryption import get_secure_storage
+        storage = get_secure_storage()
+        
+        if storage:
+            # Load SSH learning data
+            ssh_data = storage.load_learning_data('ssh_topology', {})
+            host_data = storage.load_learning_data('host_capabilities', {})
+            
+            print(f"Known hosts: {len(ssh_data.get('hosts', {}))}")
+            print(f"SSH connections learned: {len(ssh_data.get('connections', []))}")
+            print(f"Host capabilities: {len(host_data.get('capabilities', {}))}")
+            
+            if ssh_data.get('hosts'):
+                print("\nHosts:")
+                for host, info in ssh_data['hosts'].items():
+                    print(f"  • {host}: {info.get('success_rate', 0):.1%} success rate")
+        else:
+            print("Learning system not available (missing encryption modules)")
+            
+    except ImportError:
+        print("Learning system not available (missing dependencies)")
+        
+        # Fallback to simple file check
+        if FALLBACK_DB.exists():
+            print(f"Fallback data found at: {FALLBACK_DB}")
+        else:
+            print("No learning data found")
+    
+    except Exception as e:
+        print(f"Error loading learning data: {e}")
 
 if __name__ == '__main__':
     main()

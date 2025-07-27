@@ -164,8 +164,9 @@ Add your own hooks to the `hooks/` directory and they'll be synced across hosts.
 The router automatically reads your `~/.ssh/config` for available hosts.
 
 ### Learning Data Management
-- View learning data: `python3 ~/.claude/claude-hooks/hooks/ssh-router-enhanced.py --stats`
-- Reset learning: `rm ~/.claude/ssh_topology.pkl`
+- View SSH learning: `python3 ~/.claude/claude-hooks/hooks/ssh-router-enhanced.py --stats`
+- View bash optimization: `python3 ~/.claude/claude-hooks/hooks/bash-optimizer-enhanced.py --stats`
+- Reset learning: `rm ~/.claude/ssh_topology_*.pkl ~/.claude/learning_*.json`
 
 ## 🤝 Contributing
 
