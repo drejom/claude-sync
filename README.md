@@ -4,6 +4,12 @@ AI-powered command optimization and intelligent host routing for Claude Code.
 
 ## Installation
 
+### SSH Installation (Recommended for Private Repos)
+```bash
+curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install-ssh.sh | bash
+```
+
+### HTTPS Installation (Public Repos)
 ```bash
 curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install.sh | bash
 ```
