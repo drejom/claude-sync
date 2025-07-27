@@ -4,7 +4,12 @@
 
 set -e
 
-CLAUDE_HOOKS_DIR="$HOME/.claude/claude-hooks"
+# Detect if we're running from the hooks directory itself
+if [ -f "$(dirname "$0")/README.md" ] && [ -d "$(dirname "$0")/hooks" ]; then
+    CLAUDE_HOOKS_DIR="$(dirname "$0")"
+else
+    CLAUDE_HOOKS_DIR="$HOME/.claude/claude-hooks"
+fi
 CLAUDE_BIN="$(which claude 2>/dev/null || echo "")"
 
 show_help() {
@@ -42,12 +47,14 @@ check_status() {
     
     # Check hooks
     if [ -d "$CLAUDE_HOOKS_DIR" ]; then
+        ORIGINAL_DIR=$(pwd)
         cd "$CLAUDE_HOOKS_DIR"
         HOOKS_STATUS=$(git status --porcelain 2>/dev/null || echo "dirty")
         HOOKS_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
         echo "✅ Hooks: $HOOKS_COMMIT $([ -z "$HOOKS_STATUS" ] && echo "(clean)" || echo "(dirty)")"
         echo "   Location: $CLAUDE_HOOKS_DIR"
         echo "   Files: $(find hooks/ agents/ learning/ -name "*.py" 2>/dev/null | wc -l) Python files"
+        cd "$ORIGINAL_DIR"
     else
         echo "❌ Hooks: Not installed"
     fi
@@ -65,6 +72,7 @@ update_hooks() {
         mkdir -p ~/.claude
         cd ~/.claude
         git clone git@github.com:drejom/claude-hooks.git
+        setup_global_config
     else
         echo "Updating existing hooks..."
         cd "$CLAUDE_HOOKS_DIR"
@@ -78,6 +86,35 @@ update_hooks() {
         # Pull latest changes
         git pull origin main
         echo "✅ Hooks updated successfully"
+        
+        # Update global config if it exists
+        setup_global_config
+    fi
+}
+
+setup_global_config() {
+    echo "⚙️  Setting up global Claude Code configuration..."
+    
+    GLOBAL_SETTINGS="$HOME/.claude/settings.json"
+    TEMPLATE_SETTINGS="$CLAUDE_HOOKS_DIR/templates/settings.global.json"
+    
+    if [ -f "$TEMPLATE_SETTINGS" ]; then
+        if [ -f "$GLOBAL_SETTINGS" ]; then
+            echo "📋 Global settings already exist at $GLOBAL_SETTINGS"
+            read -p "   Overwrite with latest hooks configuration? (y/N): " overwrite
+            if [ "$overwrite" = "y" ] || [ "$overwrite" = "Y" ]; then
+                cp "$TEMPLATE_SETTINGS" "$GLOBAL_SETTINGS"
+                echo "✅ Global settings updated"
+            else
+                echo "⏭️  Keeping existing global settings"
+            fi
+        else
+            cp "$TEMPLATE_SETTINGS" "$GLOBAL_SETTINGS"
+            echo "✅ Global settings installed at $GLOBAL_SETTINGS"
+            echo "   Hooks will now work automatically in all Claude Code sessions!"
+        fi
+    else
+        echo "⚠️  Template settings not found at $TEMPLATE_SETTINGS"
     fi
 }
 

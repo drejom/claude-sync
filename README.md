@@ -48,12 +48,12 @@ Use the update manager for all maintenance:
 
 ## Quick Start
 
-**Option 1: Global setup (recommended)**
+The update manager automatically sets up global configuration:
 ```bash
-cp ~/.claude/claude-hooks/templates/settings.global.json ~/.claude/settings.json
+~/.claude/claude-hooks/update-claude.sh
 ```
 
-**Option 2: Per-project setup**
+**Manual per-project setup** (if needed):
 ```bash
 mkdir -p .claude && cp ~/.claude/claude-hooks/templates/settings.local.json ./.claude/
 ```
