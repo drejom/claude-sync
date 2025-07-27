@@ -11,11 +11,30 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/bash-optimizer.py"
+            "command": "$HOME/.claude/hooks/bash-optimizer-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/ssh-router.py"
+            "command": "$HOME/.claude/hooks/ssh-router-enhanced.py"
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/resource-tracker.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/bash-optimizer-enhanced.py"
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/resource-tracker.py"
           }
         ]
       }

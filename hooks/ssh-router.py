@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Self-Learning SSH Router Hook
-Learns filesystem topology across hosts and command patterns for intelligent routing.
+Enhanced Self-Learning SSH Router Hook
+Secure filesystem topology learning with host fingerprinting and AI intelligence.
 """
 
 import json
@@ -12,7 +12,15 @@ from pathlib import Path
 from collections import defaultdict, Counter
 import pickle
 
-LEARNING_DB = Path.home() / '.claude' / 'ssh_topology.pkl'
+# Import our secure learning infrastructure
+try:
+    from ..learning.encryption import get_secure_storage
+    from ..learning.abstraction import get_abstractor
+    SECURE_MODE = True
+except ImportError:
+    # Fallback to basic mode if learning infrastructure not available
+    SECURE_MODE = False
+    LEARNING_DB = Path.home() / '.claude' / 'ssh_topology.pkl'
 
 def main():
     # Read hook input

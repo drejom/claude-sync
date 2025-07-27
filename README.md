@@ -10,15 +10,22 @@ curl -sL https://raw.githubusercontent.com/drejom/claude-hooks/main/install.sh |
 
 ## 🎯 What You Get
 
-### 🔧 **Bash Optimization Superpowers**
+### 🔧 **Enhanced Bash Optimization**
 - **Smart upgrades**: `grep` → `rg`, `find` → `fd`, `cat` → `bat`
+- **AI-learned patterns**: Suggests flags based on your successful commands
+- **Domain awareness**: HPC, genomics, and R computing optimizations
 - **Safety warnings**: Dangerous operations get friendly warnings
-- **Context awareness**: Auto-adds useful flags based on environment
 
-### 🧠 **SSH Intelligence**
-- **Self-learning filesystem topology**: Learns which paths exist on which hosts
-- **Intelligent routing**: Suggests the right host for your commands
-- **Context switching**: Seamlessly handles local vs remote operations
+### 🧠 **AI-Powered SSH Intelligence**
+- **Self-learning network topology**: Securely learns host capabilities and connections
+- **Intelligent routing**: Suggests optimal hosts based on command type and learned patterns
+- **Genomics awareness**: Routes bioinformatics workflows to appropriate clusters
+- **Security-first**: All learning data encrypted and abstracted
+
+### ⚡ **Performance Intelligence**
+- **Resource monitoring**: Tracks memory, CPU, and execution time patterns
+- **Optimization suggestions**: Recommends HPC resources based on learned patterns
+- **Workflow intelligence**: Learns which tools work best where
 
 ### 🌍 **Portable Across Hosts**
 - **Synced configuration**: Same superpowers on every machine
