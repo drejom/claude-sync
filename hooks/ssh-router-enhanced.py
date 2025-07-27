@@ -61,6 +61,9 @@ def main():
     if not command:
         sys.exit(0)
     
+    # Initialize host topology on first run
+    initialize_host_topology()
+    
     # Learn from SSH commands, suggest for local commands
     if command.strip().startswith('ssh '):
         learn_from_ssh_command(command)
@@ -385,6 +388,152 @@ def save_basic_topology(topology):
     except Exception:
         pass
 
+def initialize_host_topology():
+    """Initialize host topology on first run"""
+    if not SECURE_MODE or not STORAGE:
+        # Initialize basic topology without secure storage
+        initialize_basic_topology()
+        return
+    
+    # Check if already initialized
+    topology_data = STORAGE.load_learning_data('ssh_topology', {})
+    if topology_data.get('initialized'):
+        return  # Already done
+    
+    print("🔍 Initializing host topology discovery...", file=sys.stderr)
+    
+    # Learn about current host
+    current_host = discover_current_host()
+    if current_host:
+        topology_data.setdefault('hosts', {})[current_host['hostname']] = current_host
+    
+    # Scan SSH config for known hosts
+    ssh_hosts = discover_ssh_hosts()
+    for host_info in ssh_hosts:
+        topology_data.setdefault('hosts', {})[host_info['hostname']] = host_info
+    
+    # Mark as initialized
+    topology_data['initialized'] = True
+    topology_data['initialization_time'] = time.time()
+    
+    # Store the initialized topology
+    STORAGE.store_learning_data('ssh_topology', topology_data)
+    
+    print(f"✅ Discovered {len(topology_data.get('hosts', {}))} hosts", file=sys.stderr)
+
+def discover_current_host():
+    """Discover information about the current host"""
+    import socket
+    import platform
+    import subprocess
+    
+    try:
+        hostname = socket.gethostname()
+        fqdn = socket.getfqdn()
+        
+        # Get system info
+        uname = platform.uname()
+        
+        # Try to get CPU info
+        cpu_info = "unknown"
+        try:
+            with open('/proc/cpuinfo', 'r') as f:
+                for line in f:
+                    if 'model name' in line:
+                        cpu_info = line.split(':')[1].strip()
+                        break
+        except:
+            pass
+        
+        return {
+            'hostname': hostname,
+            'fqdn': fqdn,
+            'system': uname.system,
+            'machine': uname.machine,
+            'processor': uname.processor,
+            'cpu_model': cpu_info,
+            'is_current_host': True,
+            'discovered_at': time.time(),
+            'connection_success_rate': 1.0,  # localhost always works
+            'capabilities': ['local_execution', 'file_access']
+        }
+    except Exception:
+        return None
+
+def discover_ssh_hosts():
+    """Discover hosts from SSH config"""
+    import subprocess
+    ssh_hosts = []
+    
+    try:
+        # Read SSH config
+        ssh_config_path = Path.home() / '.ssh' / 'config'
+        if not ssh_config_path.exists():
+            return ssh_hosts
+        
+        with open(ssh_config_path, 'r') as f:
+            config_content = f.read()
+        
+        # Parse Host entries
+        for line in config_content.split('\n'):
+            line = line.strip()
+            if line.startswith('Host ') and not line.startswith('Host *'):
+                hostname = line.split()[1]
+                if hostname and not hostname.startswith('*'):
+                    ssh_hosts.append({
+                        'hostname': hostname,
+                        'source': 'ssh_config',
+                        'discovered_at': time.time(),
+                        'connection_success_rate': 0.5,  # Unknown, assume 50%
+                        'capabilities': ['remote_execution', 'file_transfer']
+                    })
+    
+    except Exception:
+        pass
+    
+    return ssh_hosts
+
+def initialize_basic_topology():
+    """Initialize basic topology without secure storage"""
+    # Check if already initialized
+    if FALLBACK_DB.exists():
+        try:
+            with open(FALLBACK_DB, 'rb') as f:
+                topology = pickle.load(f)
+                if topology.get('initialized'):
+                    return  # Already done
+        except:
+            pass
+    
+    print("🔍 Initializing basic host topology...", file=sys.stderr)
+    
+    # Learn about current host
+    current_host = discover_current_host()
+    ssh_hosts = discover_ssh_hosts()
+    
+    # Build basic topology
+    topology = {
+        'hosts': {},
+        'initialized': True,
+        'initialization_time': time.time()
+    }
+    
+    if current_host:
+        topology['hosts'][current_host['hostname']] = current_host
+    
+    for host_info in ssh_hosts:
+        topology['hosts'][host_info['hostname']] = host_info
+    
+    # Store basic topology
+    try:
+        FALLBACK_DB.parent.mkdir(parents=True, exist_ok=True)
+        with open(FALLBACK_DB, 'wb') as f:
+            pickle.dump(topology, f)
+    except Exception:
+        pass
+    
+    print(f"✅ Discovered {len(topology.get('hosts', {}))} hosts", file=sys.stderr)
+
 def show_learning_stats():
     """Show learning statistics for standalone usage"""
     print("SSH Router Enhanced - Learning Statistics")
@@ -417,7 +566,22 @@ def show_learning_stats():
         
         # Fallback to simple file check
         if FALLBACK_DB.exists():
-            print(f"Fallback data found at: {FALLBACK_DB}")
+            try:
+                with open(FALLBACK_DB, 'rb') as f:
+                    topology = pickle.load(f)
+                    hosts = topology.get('hosts', {})
+                    print(f"Known hosts: {len(hosts)}")
+                    print(f"Initialized: {topology.get('initialized', False)}")
+                    
+                    if hosts:
+                        print("\nHosts:")
+                        for hostname, info in hosts.items():
+                            host_type = "current" if info.get('is_current_host') else "remote"
+                            success_rate = info.get('connection_success_rate', 0)
+                            capabilities = ', '.join(info.get('capabilities', []))
+                            print(f"  • {hostname} ({host_type}): {success_rate:.1%} success, {capabilities}")
+            except Exception as e:
+                print(f"Error reading fallback data: {e}")
         else:
             print("No learning data found")
     
