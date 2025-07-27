@@ -4,7 +4,7 @@
 
 set -e
 
-HOOKS_REPO_DIR="$HOME/.claude/hooks-repo"
+HOOKS_REPO_DIR="$HOME/.claude/claude-hooks"
 HOOKS_DIR="$HOME/.claude/hooks"
 
 echo "🔄 Updating Claude Code Hooks..."

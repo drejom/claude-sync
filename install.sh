@@ -5,7 +5,7 @@
 set -e
 
 REPO_URL="https://github.com/drejom/claude-hooks.git"
-HOOKS_REPO_DIR="$HOME/.claude/hooks-repo"
+HOOKS_REPO_DIR="$HOME/.claude/claude-hooks"
 HOOKS_DIR="$HOME/.claude/hooks"
 
 echo "🚀 Installing Claude Code Portable Hooks..."
@@ -56,7 +56,7 @@ elif [ -f "$HOME/.zshrc" ]; then
 fi
 
 if [ -n "$SHELL_RC" ]; then
-    ALIAS_LINE='alias update-claude-hooks="cd ~/.claude/hooks-repo && git pull origin main"'
+    ALIAS_LINE='alias update-claude-hooks="cd ~/.claude/claude-hooks && git pull origin main"'
     if ! grep -q "update-claude-hooks" "$SHELL_RC" 2>/dev/null; then
         echo "" >> "$SHELL_RC"
         echo "# Claude Code Hooks" >> "$SHELL_RC"

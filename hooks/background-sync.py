@@ -68,7 +68,7 @@ class BackgroundSync:
     def _check_hook_updates(self):
         """Check for hook updates from GitHub"""
         try:
-            hooks_repo_dir = Path.home() / '.claude' / 'hooks-repo'
+            hooks_repo_dir = Path.home() / '.claude' / 'claude-hooks'
             
             if not hooks_repo_dir.exists():
                 return

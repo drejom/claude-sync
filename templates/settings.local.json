@@ -11,27 +11,27 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/background-sync.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/background-sync.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/bash-optimizer-enhanced.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/bash-optimizer-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/ssh-router-enhanced.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/ssh-router-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/resource-tracker.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/resource-tracker.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/docs-reviewer.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/docs-reviewer.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/docs-editor-agent.py"
+            "command": "$HOME/.claude/claude-hooks/agents/docs-editor-agent.py"
           }
         ]
       },
@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/docs-agent-orchestrator.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/docs-agent-orchestrator.py"
           }
         ]
       }
@@ -51,11 +51,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/bash-optimizer-enhanced.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/bash-optimizer-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/resource-tracker.py"
+            "command": "$HOME/.claude/claude-hooks/hooks/resource-tracker.py"
           }
         ]
       }
