@@ -1,0 +1,110 @@
+{
+  "description": "Optimized claude-sync settings for maximum performance",
+  "performance_mode": "optimized",
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "description": "High-performance bash command optimization and routing",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/bash-optimizer-enhanced.py",
+            "timeout_ms": 10,
+            "priority": "high"
+          },
+          {
+            "type": "command", 
+            "command": "$HOME/.claude/hooks/ssh-router-enhanced.py",
+            "timeout_ms": 15,
+            "priority": "high"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Write|Edit",
+        "description": "File operation enhancements",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/context-enhancer.py",
+            "timeout_ms": 5,
+            "priority": "medium"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "description": "Performance monitoring and learning data collection",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/resource-tracker.py",
+            "timeout_ms": 20,
+            "priority": "medium"
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/learning-collector.py",
+            "timeout_ms": 30,
+            "priority": "low"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "description": "Context enhancement for prompts",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/context-enhancer.py",
+            "timeout_ms": 10,
+            "priority": "medium"
+          }
+        ]
+      }
+    ]
+  },
+  "performance_targets": {
+    "pre_tool_use_hook_ms": 10,
+    "post_tool_use_hook_ms": 50,
+    "user_prompt_submit_hook_ms": 20,
+    "total_memory_mb": 50,
+    "daily_learning_data_mb": 1
+  },
+  "learning_config": {
+    "enabled": true,
+    "auto_cleanup": true,
+    "retention_days": 30,
+    "max_data_size_mb": 25,
+    "background_sync": true,
+    "adaptive_thresholds": true
+  },
+  "security_config": {
+    "encryption_enabled": true,
+    "key_rotation_hours": 24,
+    "host_verification": true,
+    "secure_learning_data": true
+  },
+  "optimization_features": {
+    "command_caching": true,
+    "pattern_prediction": true,
+    "resource_awareness": true,
+    "network_optimization": true,
+    "batch_operations": true
+  }
+}

@@ -50,10 +50,22 @@ USAGE:
 COMMANDS:
     install         Fresh installation (auto-detects SSH vs HTTPS)
     update          Update existing installation
-    status          Show current system status
+    activate        Activate claude-sync hooks (global or project-specific)
+    deactivate      Deactivate claude-sync hooks with optional data purging
+    status          Show current system status and health metrics
+    test            Run comprehensive test suites (quick or full)
+    diagnostics     Run comprehensive health checks and system analysis
+    validate        Run bootstrap validation for system readiness
+    rollback        Restore settings from backup
     manage          Interactive management mode
     fix-stuck       Fix stuck installations
     nuclear         Complete reinstall (removes everything)
+
+ACTIVATION COMMANDS:
+    activate --global     Activate hooks globally (all Claude Code sessions)
+    activate --project    Activate hooks for current project only
+    deactivate           Clean removal with settings restore
+    deactivate --purge   Also remove all learning data
 
 OPTIONS:
     --ssh           Force SSH clone method (requires SSH keys)
@@ -61,22 +73,26 @@ OPTIONS:
     --with-claude   Also install/update Claude Code
     --symlinks      Use symlinks for hook deployment (default)
     --copy          Copy files instead of symlinking
+    --dry-run       Show what would be changed without doing it
+    --test-mode     Use isolated test environment
     --help, -h      Show this help
 
 EXAMPLES:
-    $0 install                    # Auto-detect best installation method
-    $0 install --ssh              # Force SSH installation
-    $0 update --with-claude       # Update hooks and Claude Code
-    $0 status                     # Check current status
-    $0 manage                     # Interactive mode
-    $0 nuclear                    # Nuclear option - reinstall everything
+    $0 install                           # Auto-detect best installation method
+    $0 activate --global                 # Activate hooks globally
+    $0 activate --project --dry-run      # Preview project activation
+    $0 status                            # Check activation status and health
+    $0 test --comprehensive              # Run full test suite
+    $0 diagnostics --health-score        # Get system health score
+    $0 deactivate --purge                # Clean deactivation with data removal
+    $0 rollback                          # Emergency settings restore
 
 QUICK START:
     # For first-time users
     curl -sL https://raw.githubusercontent.com/drejom/claude-sync/main/bootstrap.sh | bash -s install
 
     # For existing users
-    ~/.claude/claude-sync/bootstrap.sh update
+    ~/.claude/claude-sync/bootstrap.sh activate --global
 
 DOCUMENTATION:
     See CLAUDE.md for comprehensive documentation
@@ -711,6 +727,701 @@ install_claude_code() {
     fi
 }
 
+# Activation/Deactivation functions
+cmd_activate() {
+    local scope=""
+    local dry_run=false
+    local test_mode=false
+    
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --global)
+                scope="global"
+                shift
+                ;;
+            --project)
+                scope="project"
+                shift
+                ;;
+            --dry-run)
+                dry_run=true
+                shift
+                ;;
+            --test-mode)
+                test_mode=true
+                shift
+                ;;
+            *)
+                log_error "Unknown activate option: $1"
+                exit 1
+                ;;
+        esac
+    done
+    
+    if [ -z "$scope" ]; then
+        log_error "Activation scope required: --global or --project"
+        echo "Usage: $0 activate --global|--project [--dry-run] [--test-mode]"
+        exit 1
+    fi
+    
+    echo "🚀 Activating Claude-Sync ($scope)"
+    echo "================================="
+    
+    if [ "$dry_run" = true ]; then
+        log_info "🔍 DRY RUN MODE - No changes will be made, showing what would happen"
+    fi
+    
+    if [ "$test_mode" = true ]; then
+        log_info "🧪 TEST MODE - Using isolated environment"
+    fi
+    
+    # Check dependencies
+    check_dependencies
+    
+    # Verify claude-sync installation
+    if [ ! -d "$SYNC_DIR" ]; then
+        log_error "Claude-sync not installed. Run 'bootstrap.sh install' first."
+        exit 1
+    fi
+    
+    # Run activation using Python manager
+    cd "$SYNC_DIR"
+    local python_cmd="python3 activation_manager.py"
+    
+    if [ "$scope" = "global" ]; then
+        if [ "$dry_run" = true ]; then
+            log_info "Would activate globally for all Claude Code sessions"
+            log_info "Would create symlinks in ~/.claude/hooks/"
+            log_info "Would backup and merge ~/.claude/settings.json"
+        else
+            log_step "Activating globally..."
+            if python3 -c "
+from activation_manager import ActivationManager
+manager = ActivationManager()
+result = manager.activate_global()
+print(f'Success: {result.success}')
+print(f'Message: {result.message}')
+for action in result.actions_performed:
+    print(f'  - {action}')
+if result.errors:
+    print('Errors:')
+    for error in result.errors:
+        print(f'  ! {error}')
+exit(0 if result.success else 1)
+"; then
+                log_success "Global activation completed successfully!"
+                echo ""
+                echo "📚 Claude-sync is now active globally"
+                echo "   All Claude Code sessions will use intelligent hooks"
+                echo "   Hooks location: ~/.claude/hooks/"
+                echo "   Settings: ~/.claude/settings.json"
+            else
+                log_error "Global activation failed"
+                exit 1
+            fi
+        fi
+    elif [ "$scope" = "project" ]; then
+        local project_path="$(pwd)"
+        if [ "$dry_run" = true ]; then
+            log_info "Would activate for current project: $project_path"
+            log_info "Would create symlinks in ./.claude/hooks/"
+            log_info "Would create/update ./.claude/settings.json"
+        else
+            log_step "Activating for current project..."
+            if python3 -c "
+from pathlib import Path
+from activation_manager import ActivationManager
+manager = ActivationManager()
+result = manager.activate_project(Path('$project_path'))
+print(f'Success: {result.success}')
+print(f'Message: {result.message}')
+for action in result.actions_performed:
+    print(f'  - {action}')
+if result.errors:
+    print('Errors:')
+    for error in result.errors:
+        print(f'  ! {error}')
+exit(0 if result.success else 1)
+"; then
+                log_success "Project activation completed successfully!"
+                echo ""
+                echo "📚 Claude-sync is now active for this project"
+                echo "   Project path: $project_path"
+                echo "   Hooks location: ./.claude/hooks/"
+                echo "   Settings: ./.claude/settings.json"
+            else
+                log_error "Project activation failed"
+                exit 1
+            fi
+        fi
+    fi
+}
+
+cmd_deactivate() {
+    local purge_data=false
+    local dry_run=false
+    
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --purge)
+                purge_data=true
+                shift
+                ;;
+            --dry-run)
+                dry_run=true
+                shift
+                ;;
+            *)
+                log_error "Unknown deactivate option: $1"
+                exit 1
+                ;;
+        esac
+    done
+    
+    echo "🔄 Deactivating Claude-Sync"
+    echo "==========================="
+    
+    if [ "$dry_run" = true ]; then
+        log_info "🔍 DRY RUN MODE - No changes will be made, showing what would happen"
+    fi
+    
+    if [ "$purge_data" = true ]; then
+        log_warning "PURGE MODE - Learning data will be removed"
+    fi
+    
+    # Verify claude-sync installation
+    if [ ! -d "$SYNC_DIR" ]; then
+        log_error "Claude-sync not installed."
+        exit 1
+    fi
+    
+    # Run deactivation using Python manager
+    cd "$SYNC_DIR"
+    
+    if [ "$dry_run" = true ]; then
+        log_info "Would remove hook symlinks from ~/.claude/hooks/"
+        log_info "Would restore original settings from backup"
+        log_info "Would clean up project hook symlinks"
+        if [ "$purge_data" = true ]; then
+            log_info "Would remove learning data (after backup)"
+        fi
+    else
+        log_step "Deactivating claude-sync..."
+        local purge_python="False"
+        if [ "$purge_data" = true ]; then
+            purge_python="True"
+        fi
+        
+        if python3 -c "
+from activation_manager import ActivationManager
+manager = ActivationManager()
+result = manager.deactivate(purge_data=$purge_python)
+print(f'Success: {result.success}')
+print(f'Message: {result.message}')
+for action in result.actions_performed:
+    print(f'  - {action}')
+if result.backups_created:
+    print('Backups created:')
+    for backup in result.backups_created:
+        print(f'  📁 {backup}')
+if result.errors:
+    print('Errors:')
+    for error in result.errors:
+        print(f'  ! {error}')
+exit(0 if result.success else 1)
+"; then
+            log_success "Deactivation completed successfully!"
+            echo ""
+            echo "📚 Claude-sync has been deactivated"
+            echo "   All hooks have been removed"
+            echo "   Settings have been restored"
+            if [ "$purge_data" = true ]; then
+                echo "   Learning data has been purged (backed up first)"
+            fi
+        else
+            log_error "Deactivation failed"
+            exit 1
+        fi
+    fi
+}
+
+cmd_test() {
+    local test_mode="$1"
+    shift
+    
+    echo "🧪 Claude-Sync Test Suite"
+    echo "========================"
+    
+    # Check if test environment exists
+    if [ ! -d "$SYNC_DIR" ]; then
+        log_error "Claude-sync not installed. Run 'bootstrap.sh install' first."
+        exit 1
+    fi
+    
+    cd "$SYNC_DIR"
+    
+    case "$test_mode" in
+        --comprehensive|--full)
+            log_step "Running comprehensive test suite..."
+            if python3 bootstrap_testing.py; then
+                log_success "Comprehensive test suite passed"
+            else
+                log_error "Comprehensive test suite failed"
+                exit 1
+            fi
+            ;;
+        --quick|--basic|"")
+            log_step "Running quick test suite..."
+            
+            # Run basic activation manager tests
+            log_step "Testing activation manager..."
+            if python3 -c "
+from activation_manager import ActivationManager
+try:
+    manager = ActivationManager()
+    status = manager.get_status()
+    verification = manager.verify_installation()
+    print(f'✅ Activation manager functional')
+    print(f'   Status check: {\"✓\" if hasattr(status, \"is_activated\") else \"✗\"}')
+    print(f'   Installation verification: {\"✓\" if verification.get(\"overall_status\", False) else \"✗\"}')
+    exit(0)
+except Exception as e:
+    print(f'❌ Activation manager failed: {e}')
+    exit(1)
+"; then
+                log_success "Activation manager tests passed"
+            else
+                log_error "Activation manager tests failed"
+                exit 1
+            fi
+            
+            # Test hook files syntax
+            log_step "Testing hook file syntax..."
+            local hook_test_count=0
+            local hook_pass_count=0
+            
+            for hook_file in hooks/*.py; do
+                if [ -f "$hook_file" ]; then
+                    hook_test_count=$((hook_test_count + 1))
+                    
+                    # Basic syntax check
+                    if python3 -m py_compile "$hook_file" 2>/dev/null; then
+                        hook_pass_count=$((hook_pass_count + 1))
+                    fi
+                fi
+            done
+            
+            log_info "Hook syntax tests: $hook_pass_count/$hook_test_count passed"
+            
+            # Test templates
+            log_step "Testing settings templates..."
+            local template_test_count=0
+            local template_pass_count=0
+            
+            for template_file in templates/*.json; do
+                if [ -f "$template_file" ]; then
+                    template_test_count=$((template_test_count + 1))
+                    
+                    # JSON syntax check
+                    if python3 -c "import json; json.load(open('$template_file'))" 2>/dev/null; then
+                        template_pass_count=$((template_pass_count + 1))
+                    fi
+                fi
+            done
+            
+            log_info "Template tests: $template_pass_count/$template_test_count passed"
+            
+            # Overall results
+            echo ""
+            if [ $hook_pass_count -eq $hook_test_count ] && [ $template_pass_count -eq $template_test_count ]; then
+                log_success "Quick tests passed! ✨"
+                echo ""
+                echo "📚 Test summary:"
+                echo "   Activation manager: ✓"
+                echo "   Hook files: $hook_pass_count/$hook_test_count ✓"
+                echo "   Templates: $template_pass_count/$template_test_count ✓"
+                echo "   System: Ready for activation"
+                echo ""
+                echo "💡 Run 'bootstrap.sh test --comprehensive' for full testing"
+            else
+                log_error "Some quick tests failed"
+                exit 1
+            fi
+            ;;
+        --help)
+            echo "Test modes:"
+            echo "  --quick, --basic, (default): Run basic syntax and functionality tests"
+            echo "  --comprehensive, --full:     Run complete test suite with performance testing"
+            echo "  --help:                      Show this help"
+            ;;
+        *)
+            log_error "Unknown test mode: $test_mode"
+            echo "Use --help to see available test modes"
+            exit 1
+            ;;
+    esac
+}
+
+cmd_diagnostics() {
+    local diagnostic_mode="$1"
+    shift
+    
+    echo "🔍 Claude-Sync Diagnostics"
+    echo "=========================="
+    
+    # Verify claude-sync installation
+    if [ ! -d "$SYNC_DIR" ]; then
+        log_error "Claude-sync not installed."
+        exit 1
+    fi
+    
+    cd "$SYNC_DIR"
+    
+    case "$diagnostic_mode" in
+        --comprehensive|--full|"")
+            log_step "Running comprehensive system diagnostics..."
+            if python3 diagnostics_system.py; then
+                log_success "Diagnostics completed successfully"
+            else
+                log_warning "Diagnostics completed with issues"
+                # Don't exit on diagnostics warnings - they're informational
+            fi
+            ;;
+        --quick|--basic)
+            log_step "Running basic system checks..."
+            python3 -c "
+from activation_manager import ActivationManager
+import sys
+
+try:
+    manager = ActivationManager()
+
+    print('🔍 Quick System Status Check')
+    print('=============================')
+
+    # Get current status
+    status = manager.get_status()
+    print(f'Activated: {\"✅\" if status.is_activated else \"❌\"} ({\"YES\" if status.is_activated else \"NO\"})')
+    print(f'Hooks installed: {len(status.hooks_installed)}')
+    if status.hooks_installed:
+        for hook in status.hooks_installed:
+            print(f'  - {hook}')
+
+    print(f'Learning data size: {status.learning_data_size_mb:.1f} MB')
+
+    if status.warnings:
+        print('\\n⚠️  Warnings:')
+        for warning in status.warnings:
+            print(f'  - {warning}')
+
+    if status.errors:
+        print('\\n❌ Errors:')
+        for error in status.errors:
+            print(f'  - {error}')
+
+    print('\\n🔧 Installation Verification')
+    print('=============================')
+
+    # Verify installation
+    verification = manager.verify_installation()
+    print(f'Overall status: {\"✅\" if verification[\"overall_status\"] else \"❌\"} ({\"HEALTHY\" if verification[\"overall_status\"] else \"ISSUES FOUND\"})')
+    print(f'Sync directory: {\"✅\" if verification[\"sync_directory\"] else \"❌\"}')
+    print(f'Hooks directory: {\"✅\" if verification[\"hooks_directory\"] else \"❌\"}')
+    print(f'Templates directory: {\"✅\" if verification[\"templates_directory\"] else \"❌\"}')
+    print(f'Learning directory: {\"✅\" if verification[\"learning_directory\"] else \"❌\"}')
+    print(f'Hook files found: {len(verification[\"hook_files\"])}')
+
+    if verification[\"issues\"]:
+        print('\\n❌ Issues found:')
+        for issue in verification[\"issues\"]:
+            print(f'  - {issue}')
+        print('\\n💡 Run \\'bootstrap.sh diagnostics --comprehensive\\' for detailed analysis')
+        sys.exit(1)
+    else:
+        print('\\n✅ No critical issues found')
+        print('\\n💡 Run \\'bootstrap.sh diagnostics --comprehensive\\' for complete health check')
+        sys.exit(0)
+
+except Exception as e:
+    print(f'❌ Diagnostics failed: {e}')
+    sys.exit(1)
+"
+            ;;
+        --health-score)
+            log_step "Calculating system health score..."
+            python3 -c "
+from diagnostics_system import DiagnosticsSystem
+
+try:
+    diagnostics = DiagnosticsSystem()
+    session = diagnostics.run_comprehensive_diagnostics()
+    
+    health_score = session.overall_health_score
+    print(f'\\n🎯 SYSTEM HEALTH SCORE: {health_score:.1%}')
+    
+    if health_score >= 0.9:
+        print('Status: EXCELLENT ✨')
+        exit_code = 0
+    elif health_score >= 0.8:
+        print('Status: GOOD 🟢')
+        exit_code = 0
+    elif health_score >= 0.6:
+        print('Status: FAIR 🟡')
+        exit_code = 1
+    else:
+        print('Status: NEEDS ATTENTION 🔴')
+        exit_code = 2
+    
+    print(f'Critical Issues: {session.critical_issues_count}')
+    print(f'Warnings: {session.warning_issues_count}')
+    
+    exit(exit_code)
+    
+except Exception as e:
+    print(f'❌ Health check failed: {e}')
+    exit(1)
+" 
+            ;;
+        --help)
+            echo "Diagnostic modes:"
+            echo "  --comprehensive, --full, (default): Run complete system diagnostics"
+            echo "  --quick, --basic:                   Run basic system checks"
+            echo "  --health-score:                     Calculate and display system health score"
+            echo "  --help:                             Show this help"
+            ;;
+        *)
+            log_error "Unknown diagnostic mode: $diagnostic_mode"
+            echo "Use --help to see available diagnostic modes"
+            exit 1
+            ;;
+    esac
+}
+
+cmd_validate() {
+    local validation_phase="$1"
+    shift
+    
+    echo "🔍 Claude-Sync Validation"
+    echo "========================="
+    
+    # Check if validation system exists
+    if [ ! -d "$SYNC_DIR" ]; then
+        log_error "Claude-sync not installed. Run 'bootstrap.sh install' first."
+        exit 1
+    fi
+    
+    cd "$SYNC_DIR"
+    
+    # Check if validation system is available
+    if [ ! -f "bootstrap_validation.py" ]; then
+        log_error "Validation system not available. Please update claude-sync."
+        exit 1
+    fi
+    
+    case "$validation_phase" in
+        pre-install|pre)
+            log_step "Running pre-installation validation..."
+            if python3 bootstrap_validation.py pre-install; then
+                log_success "Pre-installation validation passed"
+                echo ""
+                echo "✅ System is ready for claude-sync installation"
+                echo "💡 Run 'bootstrap.sh install' to proceed"
+            else
+                log_warning "Pre-installation validation found issues"
+                echo ""
+                echo "⚠️  Please address the issues above before installation"
+                exit 1
+            fi
+            ;;
+        post-install|post)
+            log_step "Running post-installation validation..."
+            if python3 bootstrap_validation.py post-install; then
+                log_success "Post-installation validation passed"
+                echo ""
+                echo "✅ Installation integrity verified"
+                echo "💡 Run 'bootstrap.sh activate --global' to proceed"
+            else
+                log_warning "Post-installation validation found issues"
+                echo ""
+                echo "⚠️  Installation may have problems, check the issues above"
+                exit 1
+            fi
+            ;;
+        activation)
+            log_step "Running activation validation..."
+            if python3 bootstrap_validation.py activation; then
+                log_success "Activation validation passed" 
+                echo ""
+                echo "✅ System is ready for activation"
+            else
+                log_warning "Activation validation found issues"
+                echo ""
+                echo "⚠️  Address issues above before activation"
+                exit 1
+            fi
+            ;;
+        continuous|health)
+            log_step "Running continuous health validation..."
+            if python3 bootstrap_validation.py continuous; then
+                log_success "Continuous validation passed"
+                echo ""
+                echo "✅ System health is good"
+            else
+                log_warning "Continuous validation found issues"
+                echo ""
+                echo "⚠️  System health needs attention"
+                exit 1
+            fi
+            ;;
+        --json)
+            # JSON output for all phases
+            local phase="${2:-continuous}"
+            python3 bootstrap_validation.py "$phase" --json
+            ;;
+        --help|"")
+            echo "Validation phases:"
+            echo "  pre-install, pre:         Validate system before installation"
+            echo "  post-install, post:       Validate installation integrity"
+            echo "  activation:               Validate system readiness for activation"
+            echo "  continuous, health:       Validate ongoing system health"
+            echo "  --json [phase]:           Output validation results in JSON format"
+            echo "  --help:                   Show this help"
+            echo ""
+            echo "Examples:"
+            echo "  bootstrap.sh validate pre-install    # Check system before install"
+            echo "  bootstrap.sh validate post-install   # Verify installation"
+            echo "  bootstrap.sh validate activation     # Check activation readiness"
+            echo "  bootstrap.sh validate health         # Monitor system health"
+            ;;
+        *)
+            log_error "Unknown validation phase: $validation_phase"
+            echo "Use --help to see available validation phases"
+            exit 1
+            ;;
+    esac
+}
+
+cmd_rollback() {
+    echo "🔄 Claude-Sync Rollback"
+    echo "======================="
+    
+    # Verify claude-sync installation
+    if [ ! -d "$SYNC_DIR" ]; then
+        log_error "Claude-sync not installed."
+        exit 1
+    fi
+    
+    local backup_dir="$SYNC_DIR/backups"
+    if [ ! -d "$backup_dir" ]; then
+        log_error "No backups found. Cannot rollback."
+        exit 1
+    fi
+    
+    # List available backups
+    log_info "Available backups:"
+    local backup_count=0
+    for backup_file in "$backup_dir"/settings_backup_*.json; do
+        if [ -f "$backup_file" ]; then
+            backup_count=$((backup_count + 1))
+            local timestamp=$(basename "$backup_file" | sed 's/settings_backup_\([0-9]*\)\.json/\1/')
+            local backup_date=$(date -d "@$timestamp" 2>/dev/null || date -r "$timestamp" 2>/dev/null || echo "Unknown date")
+            log_info "  $backup_count) $(basename "$backup_file") - $backup_date"
+        fi
+    done
+    
+    if [ $backup_count -eq 0 ]; then
+        log_error "No settings backups found."
+        exit 1
+    fi
+    
+    # For now, restore the most recent backup
+    local latest_backup=$(ls -t "$backup_dir"/settings_backup_*.json | head -1)
+    log_warning "Restoring from most recent backup: $(basename "$latest_backup")"
+    
+    read -p "Continue with rollback? (y/N): " confirm
+    if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+        log_info "Rollback cancelled"
+        exit 0
+    fi
+    
+    # Perform rollback
+    cd "$SYNC_DIR"
+    log_step "Rolling back settings..."
+    
+    if python3 -c "
+from pathlib import Path
+from activation_manager import SettingsMerger
+import shutil
+
+backup_path = Path('$latest_backup')
+target_path = Path.home() / '.claude' / 'settings.json'
+
+if backup_path.exists():
+    shutil.copy2(backup_path, target_path)
+    print(f'Settings restored from: {backup_path}')
+    print(f'Restored to: {target_path}')
+else:
+    print('Backup file not found')
+    exit(1)
+"; then
+        log_success "Rollback completed successfully!"
+        log_info "Settings have been restored from backup"
+        log_info "You may need to run 'bootstrap.sh deactivate' to clean up hooks"
+    else
+        log_error "Rollback failed"
+        exit 1
+    fi
+}
+
+# Enhanced status function with activation details
+cmd_status_enhanced() {
+    echo "🔍 Claude Code Sync System Status"
+    echo "=================================="
+    
+    # Original status information
+    get_system_status
+    
+    # Add activation-specific status
+    if [ -d "$SYNC_DIR" ]; then
+        cd "$SYNC_DIR"
+        echo ""
+        echo "🚀 Activation Status"
+        echo "==================="
+        
+        python3 -c "
+from activation_manager import ActivationManager
+manager = ActivationManager()
+status = manager.get_status()
+
+if status.is_activated:
+    print('✅ Claude-sync is ACTIVATED')
+    print(f'   Active hooks: {len(status.hooks_installed)}')
+    for hook in status.hooks_installed:
+        print(f'     - {hook}')
+else:
+    print('❌ Claude-sync is NOT ACTIVATED')
+    print('   Run: bootstrap.sh activate --global')
+
+print(f'\\n📊 System Metrics:')
+print(f'   Learning data: {status.learning_data_size_mb:.1f} MB')
+for metric, value in status.performance_metrics.items():
+    print(f'   {metric}: {value}')
+
+if status.warnings:
+    print('\\n⚠️  Warnings:')
+    for warning in status.warnings:
+        print(f'   - {warning}')
+
+if status.errors:
+    print('\\n❌ Errors:')
+    for error in status.errors:
+        print(f'   - {error}')
+"
+    fi
+}
+
 # Main script logic
 main() {
     case "${1:-}" in
@@ -722,8 +1433,29 @@ main() {
             shift
             cmd_update "$@"
             ;;
+        activate)
+            shift
+            cmd_activate "$@"
+            ;;
+        deactivate)
+            shift
+            cmd_deactivate "$@"
+            ;;
         status)
-            cmd_status
+            cmd_status_enhanced
+            ;;
+        test)
+            cmd_test
+            ;;
+        diagnostics)
+            cmd_diagnostics
+            ;;
+        validate)
+            shift
+            cmd_validate "$@"
+            ;;
+        rollback)
+            cmd_rollback
             ;;
         manage)
             cmd_manage
