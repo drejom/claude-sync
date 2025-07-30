@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.10"
+# ///
 """
 Enhanced Universal Bash Command Optimizer Hook
 Upgrades commands, adds safety features, and learns from success patterns.

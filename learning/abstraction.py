@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.10"
+# ///
 """
 Secure Data Abstraction - Convert sensitive data to safe learning patterns
 Zero-knowledge design: useful to AI, useless to attackers

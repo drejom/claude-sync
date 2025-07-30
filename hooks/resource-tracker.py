@@ -1,4 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# dependencies = [
+#   "psutil>=5.9.0"
+# ]
+# requires-python = ">=3.10"
+# ///
 """
 Resource Tracker Hook
 Monitors command performance and learns optimal resource patterns for AI suggestions.

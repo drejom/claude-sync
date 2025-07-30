@@ -1,4 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# dependencies = [
+#   "cryptography>=41.0.0"
+# ]
+# requires-python = ">=3.10"
+# ///
 """
 Secure Learning Infrastructure - Encryption & Key Management
 Military-grade security for AI learning data

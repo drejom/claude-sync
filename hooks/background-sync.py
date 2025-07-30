@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.10"
+# ///
 """
 Background Sync Hook
 Auto-magic background synchronization of hooks and learning data.
@@ -68,7 +71,7 @@ class BackgroundSync:
     def _check_hook_updates(self):
         """Check for hook updates from GitHub"""
         try:
-            hooks_repo_dir = Path.home() / '.claude' / 'claude-hooks'
+            hooks_repo_dir = Path.home() / '.claude' / 'claude-sync'
             
             if not hooks_repo_dir.exists():
                 return
@@ -129,7 +132,7 @@ class BackgroundSync:
             elif urgency == 'major':
                 # Notify about major updates but don't auto-apply
                 self._notify_user(f"🔄 Major hook updates available ({commits_behind} commits)\n" +
-                                f"Run 'update-claude-hooks' to apply:\n{changelog}")
+                                f"Run 'update-claude-sync' to apply:\n{changelog}")
                 
             elif urgency == 'minor':
                 # Silent update for minor improvements

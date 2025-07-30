@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.10"
+# ///
 """
 Mesh Learning Sync - Secure P2P Learning Across Hosts
 Handles mixed environments: Tailscale where available, SSH fallback everywhere

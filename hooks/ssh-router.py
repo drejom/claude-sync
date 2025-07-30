@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.10"
+# ///
 """
 Enhanced Self-Learning SSH Router Hook
 Secure filesystem topology learning with host fingerprinting and AI intelligence.
