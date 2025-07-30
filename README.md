@@ -1,31 +1,37 @@
-# Claude Code Portable Hooks
+# Claude Code Portable Sync
 
-AI-powered command optimization and intelligent host routing for Claude Code.
+AI-powered command optimization and intelligent host synchronization for Claude Code.
 
 ## Installation & Setup
 
-**One-liner install + setup:**
+**One-liner install (recommended):**
 ```bash
-mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git && ~/.claude/claude-hooks/update-claude.sh --update
+curl -sL https://raw.githubusercontent.com/drejom/claude-sync/main/bootstrap.sh | bash -s install
 ```
 
-**Or step by step:**
+**Or with SSH (for contributors):**
 ```bash
-# Install
-mkdir -p ~/.claude && cd ~/.claude && git clone git@github.com:drejom/claude-hooks.git
+curl -sL https://raw.githubusercontent.com/drejom/claude-sync/main/bootstrap.sh | bash -s install --ssh
+```
 
-# Setup (auto-configures globally)
-~/.claude/claude-hooks/update-claude.sh
+**Manual installation:**
+```bash
+# Clone repository
+mkdir -p ~/.claude && cd ~/.claude
+git clone https://github.com/drejom/claude-sync.git
+
+# Run bootstrap
+~/.claude/claude-sync/bootstrap.sh install
 ```
 
 ## Dependencies
 
-The system uses modern Python tooling:
-- **uv** - Fast Python package manager (auto-installed)
-- **Dependencies** - Automatically managed via `pyproject.toml`
-- **Virtual environment** - Isolated Python environment per installation
+The system uses modern self-contained Python scripts:
+- **uv** - Fast Python package manager (auto-installed by bootstrap)
+- **Self-contained scripts** - Each Python script manages its own dependencies
+- **No global environment** - Dependencies are isolated per script
 
-All dependencies are handled automatically by the update script!
+All scripts use uv's inline dependency metadata for reproducible execution!
 
 ## Core Capabilities
 
@@ -62,17 +68,27 @@ All dependencies are handled automatically by the update script!
 
 **Update hooks and Claude Code:**
 ```bash
-~/.claude/claude-hooks/update-claude.sh --update
+~/.claude/claude-sync/bootstrap.sh update --with-claude
+```
+
+**Quick hook update:**
+```bash
+~/.claude/claude-sync/bootstrap.sh update
+```
+
+**Interactive management:**
+```bash
+~/.claude/claude-sync/bootstrap.sh manage
 ```
 
 **Fix stuck installations:**
 ```bash
-~/.claude/claude-hooks/update-claude.sh --nuclear
+~/.claude/claude-sync/bootstrap.sh nuclear
 ```
 
 **Manual per-project setup** (if needed):
 ```bash
-mkdir -p .claude && cp ~/.claude/claude-hooks/templates/settings.local.json ./.claude/
+mkdir -p .claude && cp ~/.claude/project-template.json ./.claude/settings.local.json
 ```
 
 ## 🛠️ How It Works
@@ -127,11 +143,11 @@ Each project can customize which hooks to enable in `.claude/settings.local.json
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/bash-optimizer-enhanced.py"
+            "command": "$HOME/.claude/claude-sync/hooks/bash-optimizer-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/ssh-router-enhanced.py"
+            "command": "$HOME/.claude/claude-sync/hooks/ssh-router-enhanced.py"
           }
         ]
       }
@@ -173,9 +189,10 @@ Add your own hooks to the `hooks/` directory and they'll be synced across hosts.
 The router automatically reads your `~/.ssh/config` for available hosts.
 
 ### Learning Data Management
-- View all statistics: `~/.claude/claude-hooks/claude-hooks-stats`
-- View SSH learning: `~/.claude/claude-hooks/claude-hooks-stats ssh`
-- View bash optimization: `~/.claude/claude-hooks/claude-hooks-stats bash`
+- Check system status: `~/.claude/claude-sync/bootstrap.sh status`
+- View all statistics: `~/.claude/claude-sync/claude-sync-stats`
+- View SSH learning: `~/.claude/claude-sync/claude-sync-stats ssh`
+- View bash optimization: `~/.claude/claude-sync/claude-sync-stats bash`
 - Reset learning: `rm ~/.claude/ssh_topology_*.pkl ~/.claude/learning_*.json`
 
 ## 🤝 Contributing
