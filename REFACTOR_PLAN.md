@@ -509,6 +509,88 @@ This learning system focuses purely on knowledge accrual - continuously building
 
 ---
 
+## 🔐 **CRITICAL SECURITY PRINCIPLE: LEARNING DATA NEVER LEAVES THE MESH**
+
+### **🚫 ZERO REPOSITORY CONTAMINATION GUARANTEE**
+
+**LEARNING DATA IS NEVER, EVER CHECKED INTO THE REPOSITORY:**
+- ❌ No command patterns in git history
+- ❌ No host performance metrics in commits  
+- ❌ No network topology data in repository
+- ❌ No user workflow preferences stored in code
+- ❌ No real hostnames, paths, or sensitive data ANYWHERE in repository
+
+**REPOSITORY CONTAINS ONLY:**
+- ✅ Hook implementation code (`hooks/*.py`)
+- ✅ Learning infrastructure code (`learning/*.py`)
+- ✅ Installation and bootstrap scripts  
+- ✅ Agent definitions and documentation
+- ✅ Architecture and configuration templates
+
+**LEARNING DATA LIVES ONLY:**
+- 🔒 **Locally encrypted** in `~/.claude/learning/*.enc` (gitignored)
+- 🔒 **Direct P2P mesh** between trusted hosts (Tailscale/SSH)
+- 🔒 **Abstracted patterns** shared peer-to-peer (no real data)
+- 🔒 **Memory/cache** during active learning operations
+
+### **MESH-ONLY INTELLIGENCE SHARING**
+
+**Direct P2P Architecture (NO Repository Involvement):**
+```
+Host A Learning Data ←──── ENCRYPTED P2P SYNC ────→ Host B Learning Data
+     ↓                           (Tailscale/SSH)                    ↓
+ [Local Encrypted Storage]                                [Local Encrypted Storage]
+     ↓                                                              ↓
+ ~/.claude/learning/*.enc                                ~/.claude/learning/*.enc
+     ↓                                                              ↓
+ NEVER TOUCHES REPOSITORY ←─────── SECURE BARRIER ─────→ NEVER TOUCHES REPOSITORY
+```
+
+**What Gets Shared P2P (Abstracted Only):**
+```python
+# ✅ SAFE - Abstracted pattern shared between trusted hosts
+{
+  "command_category": "text_search",     # NOT real command
+  "success_rate": 0.92,                 # Statistical pattern only
+  "performance_tier": "fast",           # General classification
+  "common_flags": {"--color": 5}        # Flag popularity only
+}
+
+# ❌ NEVER SHARED - Real command data stays local and encrypted
+"grep secret_project /home/user/confidential/project_data.txt"
+```
+
+**Privacy Protection Layers:**
+1. **Local Encryption**: All learning data encrypted with host-specific keys
+2. **Abstraction Layer**: Real data never leaves local host in any form
+3. **P2P Only**: No intermediate storage, no repository involvement
+4. **Mesh Authentication**: Only trusted hosts participate in learning
+5. **Automatic Expiration**: Learning data auto-expires to prevent accumulation
+
+### **DEVELOPMENT SAFETY GUARANTEE**
+
+**Repository is Always Safe to Share:**
+- Public repositories contain zero sensitive information
+- Private repositories contain zero learning intelligence  
+- Code reviews never expose user workflows or system details
+- Open source contributions possible without privacy concerns
+
+**Local Development Isolation:**
+```bash
+# ✅ SAFE - Repository operations never touch learning data
+git add hooks/bash-optimizer.py     # Safe: infrastructure code only
+git commit -m "enhance hook logic"  # Safe: no learning data involved
+git push origin main                # Safe: zero sensitive information
+
+# 🔒 PRIVATE - Learning data operations completely separate
+~/.claude/learning/                 # Encrypted, local, gitignored
+claude-sync mesh-status             # P2P mesh only, no repository
+```
+
+This **ABSOLUTE SEPARATION** ensures that your repository remains completely clean while your learning intelligence operates securely within the encrypted P2P mesh.
+
+---
+
 ## 🔐 **Simple Host Authorization & Key Management**
 
 ### **Current Problem**
@@ -1113,6 +1195,11 @@ This approach ensures:
 - **Atomic operations** - no partial state corruption
 
 ---
+
+## Doucumentation
+
+Readme should be "getting started guide"
+Other advanced topics as needed, fully integrated and cross referenced md
 
 ---
 
@@ -1719,6 +1806,53 @@ You are the Learning Engine Architect responsible for the intelligent learning s
 - R/container workflow pattern recognition
 - Tailscale network performance learning
 - Cross-host capability and topology mapping
+
+**STRONG RECOMMENDATION: Hybrid Foundation Approach**
+
+Consider adopting the proven comprehensive logging approach from [claude-code-hooks-mastery](https://github.com/disler/claude-code-hooks-mastery) as your learning data foundation:
+
+**Phase 1: Simple Foundation (Inspired by claude-code-hooks-mastery)**
+```python
+# Comprehensive command logging foundation
+def log_all_commands(hook_input):
+    """Log every Claude Code command execution - simple JSON to file"""
+    command_log = {
+        'timestamp': time.time(),
+        'tool_name': hook_input.get('tool_name'),
+        'command': hook_input.get('tool_input', {}).get('command', ''),
+        'exit_code': hook_input.get('tool_output', {}).get('exit_code'),
+        'duration': calculate_duration(hook_input),
+        'working_dir': os.getcwd(),
+        'session_id': get_session_id()
+    }
+    
+    # Simple append to daily log file  
+    log_file = Path.home() / '.claude' / 'learning' / f"commands_{date.today()}.jsonl"
+    with open(log_file, 'a') as f:
+        f.write(json.dumps(command_log) + '\n')
+```
+
+**Phase 2: Sophisticated Enhancement (Our Advanced Features)**
+- Layer encrypted storage and abstraction on top of simple logs
+- Build adaptive schemas from the comprehensive command history
+- Add cross-host mesh learning using the proven logging foundation
+- Implement information threshold triggers based on logged patterns
+
+**Benefits of Hybrid Approach:**
+- ✅ **Immediate value** from proven simple logging (like claude-code-hooks-mastery)
+- ✅ **Debuggable foundation** that you can analyze and build upon
+- ✅ **Comprehensive data capture** - never miss a command execution
+- ✅ **Sophisticated intelligence** layered on proven foundation
+- ✅ **Evolutionary development** - start simple, enhance over time
+
+**Architecture Recommendation:**
+```
+Raw Command Logs (JSONL) → Pattern Analysis → Encrypted Learning Storage → P2P Mesh Sync
+     ↑                           ↑                    ↑                      ↑
+Simple & Proven          Smart Analysis      Security Layer         Advanced Feature
+```
+
+This hybrid approach gives you both the immediate reliability of their proven logging system and the long-term sophistication of our advanced learning architecture.
 ```
 
 #### **4. Security & Encryption Specialist (`security-specialist`)**
@@ -1915,6 +2049,66 @@ You are the Code Quality Auditor ensuring claude-sync maintains the highest stan
 - Security-sensitive code must pass security specialist review
 ```
 
+#### **9. Documentation Editor (`docs-editor`)**
+```markdown
+---
+name: docs-editor
+description: Ruthlessly edits documentation for busy scientists who value concise, actionable content over verbose explanations
+tools: Read, Grep, Glob, Bash, Edit, Write
+---
+
+You are a Documentation Editor specializing in creating pithy, action-oriented documentation for time-constrained researchers and scientists.
+
+**Your Mission:**
+Cut the fluff. Scientists read dozens of papers, documentation, and technical specs daily. They need information that gets to the point immediately.
+
+**Core Principles:**
+- **Brevity over completeness** - Essential information only
+- **Action over explanation** - What to do, not why it exists
+- **Examples over theory** - Show, don't tell
+- **Scannable structure** - Headers, bullets, code blocks for quick navigation
+- **Front-load value** - Most important information first
+
+**Documentation Standards:**
+- **Maximum 3 sentences per paragraph** - No exceptions
+- **Lead with the action** - "Run `command`" not "You might want to run..."  
+- **Code examples required** - Every concept needs a concrete example
+- **No marketing speak** - No "amazing", "powerful", "revolutionary"
+- **Assumption of competence** - Target audience knows their domain
+
+**Your Responsibilities:**
+- Edit all user-facing documentation (README, CLAUDE.md, installation guides)
+- Transform verbose technical specs into actionable quick-reference guides  
+- Create concise troubleshooting guides with direct solutions
+- Ensure all code examples are copy-pasteable and functional
+- Ruthlessly eliminate redundant or obvious information
+
+**Editing Approach:**
+```
+BEFORE: "In order to install claude-sync, you'll want to follow these comprehensive steps that will guide you through the entire installation process..."
+
+AFTER: "Install claude-sync:
+```bash
+curl -sL https://raw.githubusercontent.com/user/claude-sync/main/bootstrap.sh | bash
+```"
+```
+
+**Quality Gates:**
+- Every page must answer "what do I do?" in first 10 seconds of reading
+- No paragraph longer than 3 sentences
+- Code examples must be tested and functional
+- Remove any sentence that doesn't directly help the user accomplish their goal
+- Technical accuracy verified by relevant specialists before publication
+
+**Target Reader Profile:**
+Busy computational scientist who:
+- Reads 10+ technical documents per day
+- Values time over hand-holding
+- Prefers working examples to lengthy explanations
+- Will abandon verbose documentation immediately
+- Appreciates clear, hierarchical information structure
+```
+
 ### **Implementation Workflow**
 
 **Phase 1: Architecture & Planning**
@@ -1940,6 +2134,131 @@ You are the Code Quality Auditor ensuring claude-sync maintains the highest stan
 4. **project-orchestrator** manages final delivery and documentation
 
 This specialized team follows proven software engineering practices while leveraging Claude Code's subagent capabilities for efficient, high-quality implementation of the claude-sync system.
+
+---
+
+## 🎯 **Implementation Status & Session Handoff Notes**
+
+### **✅ Completed Architecture & Planning**
+1. **Full system architecture designed** - Learning system, hooks, agents, security
+2. **8 specialized implementation agents created** in `~/.claude/claude-sync/agents/`
+3. **Agents activated** - Need Claude Code restart in yolo mode to see them in `/agents`
+4. **Hybrid hooks + agents architecture** - Real-time hooks + deep analysis agents
+5. **Adaptive information-threshold system** - Smart agent triggering based on information density
+6. **Security model designed** - Hardware-based identity + daily key rotation
+7. **Installation strategy** - Clean activate/deactivate with Claude Code integration
+8. **🔒 CRITICAL: Zero repository contamination guarantee** - Learning data NEVER touches git
+
+### **🛠️ Ready for Implementation**
+
+**Agents Available After Restart:**
+- **`system-architect`** - Overall system design and integration
+- **`hook-specialist`** - High-performance hooks (<10ms target)
+- **`learning-architect`** - Adaptive learning system with NoSQL evolution
+- **`security-specialist`** - Military-grade encryption and authorization
+- **`bootstrap-engineer`** - Clean installation with Claude Code integration
+- **`test-specialist`** - Comprehensive testing and validation
+- **`project-orchestrator`** - Team coordination and project management
+- **`code-auditor`** - Code quality and technical debt management
+- **`docs-editor`** - Ruthless documentation editing for busy scientists
+
+### **🚀 Implementation Workflow (Post-Restart)**
+
+**Phase 1: Start with Project Orchestrator**
+```bash
+/project-orchestrator
+# Coordinate the team and break down implementation tasks
+```
+
+**Phase 2: Architecture First**
+```bash
+/system-architect
+# Design component interfaces and integration patterns
+```
+
+**Phase 3: Parallel Implementation**
+```bash
+/hook-specialist      # Implement claude-sync hooks
+/learning-architect   # Build adaptive learning system  
+/security-specialist  # Implement encryption and key management
+/bootstrap-engineer   # Create installation system
+```
+
+**Phase 4: Testing & Quality**
+```bash
+/test-specialist      # Create comprehensive test suites
+/code-auditor        # Review code quality and standards
+/docs-editor         # Create concise, actionable documentation
+```
+
+### **📁 Current Project Structure**
+```
+~/.claude/claude-sync/
+├── REFACTOR_PLAN.md              # Complete system design (this file)
+├── bootstrap.sh                  # Enhanced installation script (ready for upgrade)
+├── agents/                       # Implementation team agents
+│   ├── system-architect.md
+│   ├── hook-specialist.md
+│   ├── learning-architect.md
+│   ├── security-specialist.md
+│   ├── bootstrap-engineer.md
+│   ├── test-specialist.md
+│   ├── project-orchestrator.md
+│   ├── code-auditor.md
+│   └── docs-editor.md
+├── hooks/                        # Current basic hooks (need enhancement)
+├── learning/                     # Learning system modules (need implementation)
+└── templates/                    # Settings templates (need creation)
+```
+
+### **🎯 Key Implementation Priorities**
+
+1. **Hook Performance** - Must execute in <10ms for real-time responsiveness
+2. **Security First** - All learning data encrypted, hardware-based host identity
+3. **Claude Code Integration** - Clean activate/deactivate, atomic operations
+4. **Adaptive Learning** - NoSQL-style schema evolution, information-threshold triggers
+5. **Testing Coverage** - Comprehensive unit, integration, and performance tests
+
+### **💡 Critical Implementation Notes**
+
+**🔒 ABSOLUTE SECURITY GUARANTEE:**
+- **Repository contains ZERO sensitive data** - Always safe to share publicly
+- **Learning data lives ONLY in encrypted local files** - `~/.claude/learning/*.enc`
+- **P2P mesh sharing ONLY abstracted patterns** - No real commands/paths/hostnames
+- **Git operations completely isolated** - No learning data ever committed
+
+**UV Script Requirements:**
+- All Python scripts must use `#!/usr/bin/env -S uv run` shebang
+- Inline dependencies in script headers
+- Self-contained with no external requirements
+
+**Claude Code Integration:**
+- User settings: `~/.claude/settings.json`
+- Global hooks: `~/.claude/hooks/`
+- Symlink-based activation (not copying)
+- JSON settings merging without overwriting user config
+
+**Performance Targets:**
+- Hook execution: <10ms (95th percentile)
+- Learning operations: <1ms overhead
+- Installation: <30 seconds full activation
+- Memory usage: <50MB learning cache
+
+**Security Standards:**
+- Hardware fingerprint from CPU serial + motherboard UUID
+- Daily key rotation with deterministic generation
+- Fernet encryption for all sensitive learning data
+- Zero-knowledge abstractions (no sensitive data in patterns)
+
+### **🔄 Session Restart Instructions**
+
+1. **Restart Claude Code in yolo mode** to activate agents
+2. **Verify agents available**: `/agents` should show all 8 implementation agents
+3. **Start with project coordination**: `/project-orchestrator` for task breakdown
+4. **Follow 4-phase implementation workflow** outlined above
+5. **Reference this REFACTOR_PLAN.md** for complete system architecture
+
+**The system is fully architected and ready for implementation. All agents have clear responsibilities, integration points, and quality standards. Ready to build! 🚀**
 
 ---
 
