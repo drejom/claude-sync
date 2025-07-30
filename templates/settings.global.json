@@ -11,37 +11,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/background-sync.py"
+            "command": "$HOME/.claude/claude-sync/hooks/background-sync.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/bash-optimizer-enhanced.py"
+            "command": "$HOME/.claude/claude-sync/hooks/bash-optimizer-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/ssh-router-enhanced.py"
+            "command": "$HOME/.claude/claude-sync/hooks/ssh-router-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/resource-tracker.py"
+            "command": "$HOME/.claude/claude-sync/hooks/resource-tracker.py"
           },
-          {
-            "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/docs-reviewer.py"
-          },
-          {
-            "type": "command",
-            "command": "$HOME/.claude/claude-hooks/agents/docs-editor-agent.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/docs-agent-orchestrator.py"
-          }
         ]
       }
     ],
@@ -51,11 +34,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/bash-optimizer-enhanced.py"
+            "command": "$HOME/.claude/claude-sync/hooks/bash-optimizer-enhanced.py"
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/claude-hooks/hooks/resource-tracker.py"
+            "command": "$HOME/.claude/claude-sync/hooks/resource-tracker.py"
           }
         ]
       }
