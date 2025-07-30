@@ -171,6 +171,32 @@ class SecureAbstractor:
         except Exception:
             return {'host_type': 'unknown', 'tools': {}, 'capabilities': []}
     
+    def abstract_execution_context(self, context):
+        """Abstract execution environment data"""
+        if not context:
+            return {}
+        
+        # Abstract sensitive context data
+        abstracted_context = {}
+        
+        # Abstract hostname if present
+        if 'hostname' in context:
+            abstracted_context['host_type'] = self.abstract_hostname(context['hostname'])
+        
+        # Keep non-sensitive system info
+        if 'os' in context:
+            abstracted_context['os_type'] = context['os']
+        
+        # Abstract any paths in context
+        for key, value in context.items():
+            if isinstance(value, str) and '/' in value:
+                abstracted_context[f'abstract_{key}'] = self.abstract_path(value)
+            elif key not in ['hostname', 'os'] and not key.startswith('abstract_'):
+                # Keep other non-sensitive context data
+                abstracted_context[key] = value
+        
+        return abstracted_context
+    
     def abstract_ssh_connection(self, ssh_command):
         """Abstract SSH connection patterns"""
         # Extract learning patterns from SSH usage without exposing topology

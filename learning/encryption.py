@@ -123,6 +123,24 @@ class SecureLearningStorage:
         except Exception:
             return default
     
+    def encrypt_data(self, data, context='default'):
+        """Encrypt data with current key"""
+        try:
+            cipher = self._derive_key(context)
+            data_json = json.dumps(data) if not isinstance(data, str) else data
+            return cipher.encrypt(data_json.encode())
+        except Exception:
+            return b''
+    
+    def decrypt_data(self, encrypted_data, context='default'):
+        """Decrypt data, return None if failed"""
+        try:
+            cipher = self._derive_key(context)
+            decrypted_data = cipher.decrypt(encrypted_data)
+            return json.loads(decrypted_data.decode())
+        except Exception:
+            return None
+    
     def cleanup_expired_data(self):
         """Remove expired learning data"""
         try:
