@@ -1,37 +1,44 @@
-# Claude Code Portable Sync
+# Claude-Sync: AI-Powered Development Intelligence
 
-AI-powered command optimization and intelligent host synchronization for Claude Code.
+Claude-Sync learns from your command patterns to provide intelligent optimization suggestions, safety warnings, and contextual assistance across distributed computing environments. The system learns successful patterns across hosts while maintaining military-grade privacy through encrypted, abstracted learning data.
 
-## Installation & Setup
+## Quick Start
 
-**One-liner install (recommended):**
 ```bash
+# Install and activate
 curl -sL https://raw.githubusercontent.com/drejom/claude-sync/main/bootstrap.sh | bash -s install
+~/.claude/claude-sync/bootstrap.sh activate --global
+
+# Verify installation
+~/.claude/claude-sync/bootstrap.sh status
 ```
 
-**Or with SSH (for contributors):**
-```bash
-curl -sL https://raw.githubusercontent.com/drejom/claude-sync/main/bootstrap.sh | bash -s install --ssh
-```
+## What You Get
 
-**Manual installation:**
-```bash
-# Clone repository
-mkdir -p ~/.claude && cd ~/.claude
-git clone https://github.com/drejom/claude-sync.git
+**Intelligent Command Optimization:**
+- `grep` → `rg` suggestions with confidence scoring
+- SLURM resource optimization based on historical success
+- Container workflow recommendations
+- Safety warnings for dangerous operations
 
-# Run bootstrap
-~/.claude/claude-sync/bootstrap.sh install
-```
+**Learning Intelligence:**
+- Cross-host pattern sharing through encrypted P2P mesh
+- Workflow sequence recognition and optimization
+- Adaptive schema evolution based on your usage patterns
+- Context-aware assistance for bioinformatics, HPC, and R workflows
 
-## Dependencies
+**Zero Configuration Security:**
+- Hardware-based host identity (survives OS reinstalls)
+- Daily automatic key rotation with cleanup
+- Military-grade encryption (Fernet + PBKDF2)
+- Zero repository contamination guarantee
 
-The system uses modern self-contained Python scripts:
-- **uv** - Fast Python package manager (auto-installed by bootstrap)
-- **Self-contained scripts** - Each Python script manages its own dependencies
-- **No global environment** - Dependencies are isolated per script
+## Performance
 
-All scripts use uv's inline dependency metadata for reproducible execution!
+- Hook execution: <10ms (real-time suggestions)
+- Learning operations: <1ms overhead
+- Memory usage: <50MB total
+- Cross-platform: macOS, Linux, WSL
 
 ## Core Capabilities
 
@@ -64,48 +71,41 @@ All scripts use uv's inline dependency metadata for reproducible execution!
 - Documentation review before git pushes
 - Secure cross-host learning data synchronization
 
-## Management
+## Commands
 
-**Update hooks and Claude Code:**
 ```bash
-~/.claude/claude-sync/bootstrap.sh update --with-claude
+~/.claude/claude-sync/bootstrap.sh status         # Show activation status
+~/.claude/claude-sync/bootstrap.sh test          # Run system tests
+~/.claude/claude-sync/bootstrap.sh deactivate    # Clean removal
+~/.claude/claude-sync/bootstrap.sh rollback      # Emergency restore
 ```
 
-**Quick hook update:**
+## Troubleshooting
+
+**Installation issues:**
 ```bash
-~/.claude/claude-sync/bootstrap.sh update
+~/.claude/claude-sync/bootstrap.sh diagnostics --health-score
 ```
 
-**Interactive management:**
+**Performance problems:**
 ```bash
-~/.claude/claude-sync/bootstrap.sh manage
+~/.claude/claude-sync/bootstrap.sh test --performance
 ```
 
-**Fix stuck installations:**
+**Complete reset:**
 ```bash
-~/.claude/claude-sync/bootstrap.sh nuclear
+~/.claude/claude-sync/bootstrap.sh deactivate --purge
 ```
 
-**Manual per-project setup** (if needed):
-```bash
-mkdir -p .claude && cp ~/.claude/project-template.json ./.claude/settings.local.json
-```
+## Architecture
 
-## 🛠️ How It Works
+Claude-Sync uses Claude Code hooks for real-time optimization and specialized agents for deep analysis:
 
-### Hook System
-- **PreToolUse hooks**: Analyze commands before execution
-- **Learning database**: Builds knowledge from your SSH usage
-- **Smart suggestions**: Context-aware recommendations
+- **PreToolUse**: Command optimization and safety warnings
+- **PostToolUse**: Silent learning data collection
+- **UserPromptSubmit**: Context injection from learned patterns
 
-### File Structure
-```
-~/.claude/
-├── hooks-repo/          # Git repository (this repo)
-├── hooks/               # Symlinks to active hooks
-├── project-template.json # Template for new projects
-└── ssh_topology.pkl     # Learned filesystem topology
-```
+Learning data stays encrypted locally (`~/.claude/learning/*.enc`) and never touches the repository.
 
 ## 🎨 Examples
 
