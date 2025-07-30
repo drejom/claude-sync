@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "PreToolUse": [],
+    "PostToolUse": []
+  },
+  "permissions": {
+    "allow": [
+      "Bash(*)"
+    ]
+  }
+}

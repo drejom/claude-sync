@@ -1,0 +1,47 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.claude/hooks/background-sync.py"
+          },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/bash-optimizer-enhanced.py"
+          },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/ssh-router-enhanced.py"
+          },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/resource-tracker.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.claude/hooks/bash-optimizer-enhanced.py"
+          },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/resource-tracker.py"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(*)"
+    ]
+  }
+}
